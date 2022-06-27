@@ -13,7 +13,7 @@ public interface FileAttachmentService {
 
     FileAttachment getAttachmentFile(String fileId) throws Exception;
 
-    List<NaceDataEntity> saveNaceDetailsAsList(List<NaceData> naceDataList);
+    void saveNaceDetailsAsList(List<NaceData> naceDataList);
 
     List<NaceDataEntity> readNaceDetails();
 

@@ -6,6 +6,7 @@ import com.clm.nace.clmnacedataanalytics.exception.ApplicationException;
 import com.clm.nace.clmnacedataanalytics.model.NaceData;
 import com.clm.nace.clmnacedataanalytics.model.ResponseData;
 import com.clm.nace.clmnacedataanalytics.service.FileAttachmentService;
+import com.clm.nace.clmnacedataanalytics.utility.FileUtility;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.ColumnPositionMappingStrategy;
 import com.opencsv.bean.CsvToBean;
@@ -44,27 +45,11 @@ public class AttachmentController {
     @PostMapping("/upload/nacedetails")
     @ApiOperation(value = "save nace api")
     public ResponseData putNaceDetails(@RequestParam("file") MultipartFile file) throws Exception, ApplicationException {
-        FileAttachment fileAttachment = null;
+        FileAttachment fileAttachment;
         if (Objects.isNull(file)) {
             throw new MultipartException("File not uploaded/File is Invalid");
         }
-        InputStream inputStream = file.getInputStream();
-        List<NaceData> naceDataList = new ArrayList<>();
-        CSVReader reader = null;
-        try (Reader inputReader = new InputStreamReader(inputStream, "UTF-8")) {
-            reader = new CSVReader(inputReader);
-            reader.readNext();
-            CsvToBean csvToBean = new CsvToBean();
-            ColumnPositionMappingStrategy mappingStrategy =
-                    new ColumnPositionMappingStrategy();
-            mappingStrategy.setType(NaceData.class);
-            String[] columns = new String[]{"order", "level", "code", "parent", "description", "itemIncludeA", "itemIncludeB", "rulings", "itemExludes", "reference"};
-            mappingStrategy.setColumnMapping(columns);
-            naceDataList = csvToBean.parse(mappingStrategy, reader);
-
-        } catch (IOException e) {
-            // handle exception
-        }
+        List<NaceData> naceDataList = FileUtility.processNaceCSV(file.getInputStream());
         fileAttachmentService.saveNaceDetailsAsList(naceDataList);
         fileAttachment = fileAttachmentService.saveNaceDetails(file);
         String downladURl = ServletUriComponentsBuilder.fromCurrentContextPath().path("/download/").path(fileAttachment.getId()).toUriString();

@@ -5,6 +5,7 @@ import com.clm.nace.clmnacedataanalytics.entity.NaceDataEntity;
 import com.clm.nace.clmnacedataanalytics.model.NaceData;
 import com.clm.nace.clmnacedataanalytics.repository.ClmNaceRepository;
 import com.clm.nace.clmnacedataanalytics.repository.FileAttachmentRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,16 +15,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@AllArgsConstructor
 public class FileAttachmentServiceImpl implements FileAttachmentService {
 
-    private FileAttachmentRepository fileAttachmentRepository;
+    private final FileAttachmentRepository fileAttachmentRepository;
 
-    private ClmNaceRepository clmNaceRepository;
+    private final ClmNaceRepository clmNaceRepository;
 
-    public FileAttachmentServiceImpl(FileAttachmentRepository fileAttachmentRepository, ClmNaceRepository clmNaceRepository) {
-        this.fileAttachmentRepository = fileAttachmentRepository;
-        this.clmNaceRepository = clmNaceRepository;
-    }
 
     @Override
     public FileAttachment saveNaceDetails(MultipartFile file) throws Exception {
@@ -35,7 +33,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
             FileAttachment fileAttachment = new FileAttachment(fileName, file.getContentType(), file.getBytes());
             return fileAttachmentRepository.save(fileAttachment);
         } catch (Exception e) {
-            throw new Exception("Could not save file" + fileName);
+            throw new RuntimeException("Could not save file" + fileName);
         }
 
     }
@@ -46,7 +44,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
     }
 
     @Override
-    public List<NaceDataEntity> saveNaceDetailsAsList(List<NaceData> naceDataList) {
+    public void saveNaceDetailsAsList(List<NaceData> naceDataList) {
         List<NaceDataEntity> naceDataEntities = new ArrayList<>();
         naceDataList.parallelStream().forEach(naceData -> {
             NaceDataEntity naceDataEntity = NaceDataEntity.builder()
@@ -63,8 +61,7 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
                     .build();
             naceDataEntities.add(naceDataEntity);
         });
-        List<NaceDataEntity> naceDataEntityList = (List<NaceDataEntity>) clmNaceRepository.saveAll(naceDataEntities);
-        return naceDataEntityList;
+        clmNaceRepository.saveAll(naceDataEntities);
     }
 
     @Override

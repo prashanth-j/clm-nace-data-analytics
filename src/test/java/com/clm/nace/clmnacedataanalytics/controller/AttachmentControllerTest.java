@@ -54,7 +54,6 @@ class AttachmentControllerTest {
         List<NaceDataEntity> naceDataEntityList = new ArrayList<>();
         FileAttachment fileAttachment = new FileAttachment();
         fileAttachment.setId("test");
-        Mockito.when(fileAttachmentService.saveNaceDetailsAsList(Mockito.any())).thenReturn(naceDataEntityList);
         Mockito.when(fileAttachmentService.saveNaceDetails((Mockito.any()))).thenReturn(fileAttachment);
         ResponseData responseData = attachmentController.putNaceDetails(csvFile);
         assertNotNull(responseData);
