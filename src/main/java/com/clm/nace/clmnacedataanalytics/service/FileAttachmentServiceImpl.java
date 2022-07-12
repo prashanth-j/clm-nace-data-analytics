@@ -66,7 +66,12 @@ public class FileAttachmentServiceImpl implements FileAttachmentService {
 
     @Override
     public List<NaceDataEntity> readNaceDetails() {
-        return clmNaceRepository.findAll();
+        try {
+            return clmNaceRepository.findAll();
+        } catch (Exception e) {
+            throw new RuntimeException("Could not read the NACE Details due to db error. " + e);
+        }
+
     }
 
     @Override
